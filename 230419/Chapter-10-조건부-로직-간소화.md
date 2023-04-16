@@ -149,3 +149,92 @@ else
 4. 조건이 하나만 남을 때까지 2~3 과정을 반복.
 5. 하나로 합쳐진 조건식을 함수로 추출할 지 고려해본다.
 
+
+## 10.3 중첩 조건문을 보호 구문으로 바꾸기
+### 조건문의 두 가지 형태
+1. 참인 경로와 거짓인 경로가 모두 정상 동작인 경우: if-else 구문을 사용
+2. 한쪽만 정상인 경우: 비정상 조건을 if에서 검사한 후, 조건이 참이면 함수에서 빠져나오기 **(보호 구문)**
+
+**절차**
+1. 교체해야할 조건 중 가장 바깥 것을 보호 구문으로 바꾼다.
+2. 테스트
+3. 1~2 과정을 필요한 만큼 반복
+4. 모든 보호구문이 같은 결과를 반환한다면 보호 구문들의 조건식을 통합
+
+
+**예시**
+직원 급여를 계산하는 코드
+현직 직원만이 급여를 받아야하므로 퇴사한 직원, 은퇴한 직원인지를 검사한다.
+
+```js
+  function payAmount(employee) {
+    let result;
+    if(employee.isSeperated) {
+      result = {amount: 0, reasonCode: "SEP"};
+    } else {
+      if(employee.isRetired) {
+        result = {amount: 0, reasonCode: "RET"};
+      } else {
+        lorem.ipsum(dolor.sitAmet); //급여 계산 로직
+        consectetur(adispicing).elit();
+        sed.do.eiusmod = tempor.incididunt.ut(labore) && dolore(magna.aliqua);
+        ut.enim.ad(minim.veniam);
+        result = somFinalComputation();
+      }
+    }
+    return result;
+  }
+```
+
+실제로 중요한 일들이 중첩된 조건에 가려서 잘 보이지 않는다.
+이 코드는 모든 조건이 거짓일 때만 일어나므로 보호 구문을 사용하면 코드의 의도가 더 잘 드러난다.
+
+
+최상의 조건부터 보호 구문으로 바꿔보자.
+
+```js
+  function payAmount(employee) {
+    let result;
+    if(employee.isSeperated) return {amount: 0, reasonCode: "SEP"};
+    if(employee.isRetired) {
+      result = {amount: 0, reasonCode: "RET"};
+    } else {
+      lorem.ipsum(dolor.sitAmet); //급여 계산 로직
+      consectetur(adispicing).elit();
+      sed.do.eiusmod = tempor.incididunt.ut(labore) && dolore(magna.aliqua);
+      ut.enim.ad(minim.veniam);
+      result = somFinalComputation();
+    }
+    return result;
+  }
+```
+
+그 다음 조건도 보호 구문으로 바꿔준다.
+```js
+  function payAmount(employee) {
+    let result;
+    if(employee.isSeperated) return {amount: 0, reasonCode: "SEP"};
+    if(employee.isRetired) return {amount: 0, reasonCode: "RET"};
+
+    lorem.ipsum(dolor.sitAmet); //급여 계산 로직
+    consectetur(adispicing).elit();
+    sed.do.eiusmod = tempor.incididunt.ut(labore) && dolore(magna.aliqua);
+    ut.enim.ad(minim.veniam);
+    result = somFinalComputation();
+    return result;
+  }
+```
+
+그 후 아무역할을 하지 않는 result 변수를 제거해준다.
+```js
+  function payAmount(employee) {
+    if(employee.isSeperated) return {amount: 0, reasonCode: "SEP"};
+    if(employee.isRetired) return {amount: 0, reasonCode: "RET"};
+
+    lorem.ipsum(dolor.sitAmet); //급여 계산 로직
+    consectetur(adispicing).elit();
+    sed.do.eiusmod = tempor.incididunt.ut(labore) && dolore(magna.aliqua);
+    ut.enim.ad(minim.veniam);
+    return somFinalComputation();
+  }
+```
