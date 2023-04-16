@@ -238,3 +238,116 @@ else
     return somFinalComputation();
   }
 ```
+
+## 10.4 조건부 로직을 다형성으로 바꾸기
+> 클래스와 다형성을 이용하면 조건부 로직을 직관적으로 구조화할 수 있다.
+
+1. 타입이 여러개이고, 각 타입이 조건부 로직을 자신만의 방식으로 처리하도록 구성된 로직의 경우
+  - case 별로 클래스를 하나씩 만들어 공통 switch 로직의 중복을 없애는 방법 활용
+2. 기본 동작을 위한 case문과 그 변형 동작으로 구성된 로직의 경우
+  - 기본 동작을 슈퍼클래스로 넣고, 변형 동작 case 들을 각각의 서브클래스로 만드는 방법 활용
+
+**예시**
+
+새의 종에 따른 비행 속도와 깃털 상태를 알려주는 프로그램
+
+```js
+  function plumages(birds) {
+    return new Map(birds.map(b => [b. name, plumage(b)]));
+  }
+  
+  function speeds(birds) {
+    return new Map(birds.map(b => [b. name, airSpeedVelocity(b)]));
+  }
+  
+  function plumage(bird) {
+    switch (bird.type) {
+      case '유럽 제비':
+        return '보통이다';
+     case '아프리카 제비':
+        return (bird.numberOfCoconuts > 2) ? '지쳤다' : '보통이다';
+     case '노르웨이 파랑 앵무':
+        return (bird.voltage > 100) ? '그을렸다' : '예쁘다';
+     default:
+        return '알 수 없다';
+    }
+  }
+  
+  function airSpeedVelocity(bird) {
+    switch (bird.type) {
+      case '유럽 제비':
+        return 35;
+     case '아프리카 제비':
+        return 40 - 2 * bird.numberOfCoconuts;
+     case '노르웨이 파랑 앵무':
+        return (bird.isNailed) ? 0 : 10 + bird.voltage / 10;
+     default:
+        return null;
+    }
+  }
+```
+
+새의 종류에 따라 다르게 동작하는 함수가 있으므로, 종류별 클래스를 만들어서 각각에 맞는 동작을 표현하면 될 것 같다.
+
+먼저 airSpeedVelocity()와 plumage()를 Bird라는 클래스로 묶어보자.
+
+
+```js
+  
+
+  function plumages(birds) {
+    return new Bird(bird).plumage; new Map(birds.map(b => [b. name, plumage(b)]));
+  }
+  
+  function speeds(birds) {
+    return new Bird(bird).airSpeedVelocity;  new Map(birds.map(b => [b. name, airSpeedVelocity(b)]));
+  }
+  
+  class Bird {
+    constructor (birdObject) {
+      Object.assign(this, birdObject);
+    }
+    
+    get plumage() {
+      switch (this.type) {
+        case '유럽 제비':
+          return '보통이다';
+       case '아프리카 제비':
+          return (this.numberOfCoconuts > 2) ? '지쳤다' : '보통이다';
+       case '노르웨이 파랑 앵무':
+          return (this.voltage > 100) ? '그을렸다' : '예쁘다';
+       default:
+          return '알 수 없다';
+      }
+    }
+    
+    get airSpeedVelocity() {
+      switch (this.type) {
+        case '유럽 제비':
+          return 35;
+       case '아프리카 제비':
+          return 40 - 2 * this.numberOfCoconuts;
+       case '노르웨이 파랑 앵무':
+          return (this.isNailed) ? 0 : 10 + bird.voltage / 10;
+       default:
+          return null;
+      }
+    }
+  }
+  
+  
+  
+  function airSpeedVelocity(bird) {
+    switch (bird.type) {
+      case '유럽 제비':
+        return 35;
+     case '아프리카 제비':
+        return 40 - 2 * bird.numberOfCoconuts;
+     case '노르웨이 파랑 앵무':
+        return (bird.isNailed) ? 0 : 10 + bird.voltage / 10;
+     default:
+        return null;
+    }
+  }
+```
+
